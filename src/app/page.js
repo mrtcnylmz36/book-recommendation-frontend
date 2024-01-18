@@ -6,15 +6,14 @@ export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [recommendations, setRecommendations] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     setUserInput(e.target.value);
   };
 
   const handleSearch = async () => {
-    // Kullanıcının girdiği verilere göre FastAPI'ye istek yap
-    // Axios veya fetch gibi bir kütüphane kullanabilirsiniz
-    // Burada kullanılan örnek, gerçek bir örnek değildir.
+    setLoading(true);
     const response = await fetch(
       `https://book-recommendation-uk6z.onrender.com/api/book_recommendation`,
       {
@@ -28,15 +27,13 @@ export default function Home() {
 
     const data = await response.json();
     setRecommendations(data.recommendations);
+    setLoading(false);
     console.log(data);
   };
 
   const handleLoadMore = async () => {
-    // Kullanıcının taleplerine göre sayfayı artır
     setCurrentPage(currentPage + 1);
 
-    // Axios veya fetch gibi bir kütüphane kullanabilirsiniz
-    // Burada kullanılan örnek, gerçek bir örnek değildir.
     const response = await fetch(
       `http://localhost:8000/api/book_recommendation?page=${currentPage + 1}`,
       {
@@ -77,6 +74,18 @@ export default function Home() {
           Search
         </button>
       </div>
+      {loading && (
+        <div className="w-full flex justify-center">
+          <div
+            class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] text-warning motion-reduce:animate-[spin_1.5s_linear_infinite] border-yellow-400"
+            role="status"
+          >
+            <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)">
+              Loading...
+            </span>
+          </div>
+        </div>
+      )}
       {recommendations && (
         <ul className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-4 gap-10 p-10 ">
           {recommendations.map((book, index) => {
